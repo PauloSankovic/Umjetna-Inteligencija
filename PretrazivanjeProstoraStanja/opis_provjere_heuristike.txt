@@ -1,0 +1,9 @@
+Složenost provjere optimističnosti:
+    - jednaka je složenosti algoritma pretraživanja s jednolikom cijenom
+        = O(b^(1 + d)), gdje je b faktor grananja, d dubina
+
+Složenost provjere konzistentnosti:
+    - for petlja po svim stanjima unutar for petlje po svim stanjima djece
+    - složenost bih procijenio na O(|S|*b), gdje je S broj stanja, b faktor grananja
+
+Trenutačna implementacija optimističnosti za provjeru heuristike 3x3_misplaced_heuristic se ne izvodi u razumnomm vremenu i može se optimizirati.

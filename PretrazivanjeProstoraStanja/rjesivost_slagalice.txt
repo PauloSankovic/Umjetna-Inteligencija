@@ -1,0 +1,20 @@
+Učitano je sveukupno 181 400 stanja slagalice. To nije ukupan broj mogućih stanja.
+Ukupan broj mogućih stanja = 9! = 362 880 (znači upravo 2 * broj učitanih stanja)
+
+Slagalicu nije moguće rješiti počevši iz bilo koje početne konfiguracije.
+
+Broj inverzija (engl. inversion) mora biti paran kako bi slagalica mogla biti rješiva.
+Inverzija je zapravo broj parova koje nisu u točnom redoslijedu.
+
+primjer slagalica = 132_456_78x
+
+Na ovom jednostavnom primjeru, brojevi 3 i 2 nisu na ispravnim pozicijama. Ako se 3 zamijeni sa 2 i 2 sa 3, dolazi se do ispravnih pozicija.
+Znači na ovom primjeru, broj inverzija je jednak 1, što je neparan broj. Tako da ova slagalica nije rješiva.
+
+
+Slagalica 4x4 ima pak 16! mogućih stanja = 2.092279e+13 
+Također slagalicu nije moguće rješiti počevši iz bilo koje početne konfiguracije.
+
+Slagalica 4x4 je rješiva ako:
+    - je broj inverzija neparan i ako je praznina na neparnom retku u slagalici (1. retku i 3. retku (brojanje retka počinje od 1))
+    - je broj inverzije paran i ako je praznina na parnom retku u slagalici (2. retku i 4. retku -> zadnjem (brojanje retka počinje od 1))

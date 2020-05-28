@@ -1,0 +1,21 @@
+Prethodno sam bio naveo da je moguće dodatno optimizirati provjeru optimističnosti.
+
+Ideja je bila da se krene iz ciljnih stanja, put se širi koristeći mapu (koju smo prethodno reverzno presložili u odnosu na ono kako je bila zadana).
+put se generira sve dalje i dalje tako da se gledaju ukupno najmanje cijene.
+
+Upravo je u ovim početnim rečenicama opisan Dijkstrin algoritam najkraćeg puta.
+Krenuvši iz ciljnih stanja i zapisujući pripadajuće cijene, izgenerira se najkraći put.
+Kao produkt toga, dobijemo mapu sa svim najkraćim udaljenostima na relaciji cilj -> pojedino stanje.
+Upravo nam ta informacija služi u provjeri optimisičnosti zadane heuristike
+
+Naivna implementacija mi je vrtila provjeru optimističnosti više od 5+
+(
+    za naivnu provjeru koristio sam UCS koji mi se za jedno stanje izvede za: UCS execution time: 1.0773 seconds
+
+    e sad, 1s * 181440 stanja... = puno sati
+)
+
+Ova nova, optimizirana provjera heuristike općenito mi se izvrti: Evaluating the heuristic function in: 1.3164 seconds
+Velika ušteda vremena.
+
+Općenito, složenost provjere optimističnosti heuristike je po mojoj procjeni jednaka O(|S| + |S|*b*log|S|)
