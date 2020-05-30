@@ -1,4 +1,5 @@
 import sys
+from decisiontree import ID3
 
 
 def parse_train_set(file):
@@ -13,7 +14,7 @@ def parse_train_set(file):
             i += 1
         else:
             parts = line.split(',')
-            train_dataset[tuple(parts[:len(header) - 1])] = list(parts[len(header) - 1:])
+            train_dataset[tuple(parts[:-1])] = parts[-1]
 
     return header, train_dataset
 
@@ -57,6 +58,16 @@ def main(argv):
     header, train_dataset = parse_train_set(argv[0])
     test_dataset, results = parse_test_set(argv[1])
     config = parse_config_file(argv[2])
+
+    model = ID3()
+    model.fit(train_dataset, train_dataset, header[:-1], set(train_dataset.values()))
+    model.print()
+    print()
+    predictions = model.predict(test_dataset, header[:-1])
+
+    print(predictions[0], end="")
+    for i in range(1, len(predictions)):
+        print(f" {predictions[i]}", end="")
 
 
 if __name__ == "__main__":
