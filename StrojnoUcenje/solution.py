@@ -41,7 +41,7 @@ def parse_test_set(file):
 def parse_config_file(file) -> dict:
     lines = open(file, 'r', encoding='utf-8').read().splitlines()
 
-    config = {'max_depth': float('Inf'), 'num_trees': int(1), 'feature_ratio': float(1), 'example_ratio': float(1)}
+    config = {'max_depth': int(-1), 'num_trees': int(1), 'feature_ratio': float(1), 'example_ratio': float(1)}
     for line in lines:
         parts = line.split('=')
         if parts[0] == 'max_depth' or parts[0] == 'num_trees':
@@ -87,7 +87,7 @@ def main(argv):
     test_dataset, results = parse_test_set(argv[1])
     config = parse_config_file(argv[2])
 
-    model = ID3()
+    model = ID3(config['max_depth'])
     model.fit(train_dataset, train_dataset, header[:-1], set(train_dataset.values()))
     model.print()
     print()

@@ -20,12 +20,12 @@ class Leaf:
 
 
 class ID3:
-    def __init__(self, hyper_parameter=()):
-        self.hyper_parameter = hyper_parameter
+    def __init__(self, max_depth):
+        self.max_depth = max_depth
         self.node = None
 
     def fit(self, td: dict, td_parent: dict, X: list, y: set):
-        self.node = id3(td, td_parent, X, y)
+        self.node = id3(td, td_parent, X, y, self.max_depth, 0)
 
     def predict(self, test_dataset: list, X: list):
         predictions = []
@@ -58,13 +58,16 @@ def print_nodes(parent: Node, index: int):
             print_nodes(subtree.node, index + 1)
 
 
-def id3(td: dict, td_parent: dict, X: list, y: set):
+def id3(td: dict, td_parent: dict, X: list, y: set, max_depth: int, depth: int):
     if len(td) == 0:
         v = most_frequent_label(td_parent)
         return Leaf(v)
 
     v = most_frequent_label(td)
     if len(X) == 0 or len(set(td.values())) == 1:
+        return Leaf(v)
+
+    if 0 <= max_depth <= depth:
         return Leaf(v)
 
     x = most_discriminative_feature(td, X)
@@ -79,7 +82,7 @@ def id3(td: dict, td_parent: dict, X: list, y: set):
             if item[index] == v:
                 td_copy[item[:index] + item[index + 1:]] = value
 
-        t = id3(td_copy, td, X, y)
+        t = id3(td_copy, td, X, y, max_depth, depth + 1)
         subtrees.append(Subtree(v, t))
 
     return Node(x, subtrees)
