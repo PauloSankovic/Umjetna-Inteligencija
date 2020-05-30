@@ -1,5 +1,6 @@
 import sys
 from decisiontree import ID3
+from randomforest import RL
 
 
 def parse_train_set(file):
@@ -87,11 +88,20 @@ def main(argv):
     test_dataset, results = parse_test_set(argv[1])
     config = parse_config_file(argv[2])
 
-    model = ID3(config['max_depth'])
-    model.fit(train_dataset, train_dataset, header[:-1], set(train_dataset.values()))
-    model.print()
-    print()
-    predictions = model.predict(test_dataset, header[:-1])
+    if config['model'] == 'ID3':
+        model = ID3(config['max_depth'])
+        model.fit(train_dataset, header[:-1], set(train_dataset.values()))
+        model.print()
+        print()
+        predictions = model.predict(test_dataset, header[:-1])
+
+    elif config['model'] == 'RF':
+        model = RL(config['num_trees'], config['max_depth'], config['example_ratio'], config['feature_ratio'])
+        model.fit(train_dataset, header[:-1], set(train_dataset.values()))
+        predictions = model.predict(test_dataset, header[:-1])
+
+    else:
+        exit("Non implemented model")
 
     print(predictions[0], end="")
     for i in range(1, len(predictions)):

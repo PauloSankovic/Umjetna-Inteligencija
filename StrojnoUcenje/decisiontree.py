@@ -24,8 +24,8 @@ class ID3:
         self.max_depth = max_depth
         self.node = None
 
-    def fit(self, td: dict, td_parent: dict, X: list, y: set):
-        self.node = id3(td, td_parent, X, y, self.max_depth, 0)
+    def fit(self, td: dict, X: list, y: set):
+        self.node = id3(td, td, X, y, self.max_depth, 0)
 
     def predict(self, test_dataset: list, X: list):
         predictions = []
