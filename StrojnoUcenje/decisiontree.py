@@ -82,14 +82,19 @@ def id3(td: dict, td_parent: dict, X: list, y: set, max_depth: int, depth: int):
             if item[index] == v:
                 td_copy[item[:index] + item[index + 1:]] = value
 
-        t = id3(td_copy, td, X, y, max_depth, depth + 1)
+        t = id3(td_copy, td, X.copy(), y.copy(), max_depth, depth + 1)
         subtrees.append(Subtree(v, t))
 
     return Node(x, subtrees)
 
 
 def most_frequent_label(dataset):
-    return max(set(dataset.values()), key=list(dataset.values()).count)
+    frequency = {}
+    for ds in dataset.values():
+        count = frequency.get(ds, 0)
+        frequency[ds] = count + 1
+
+    return sorted(frequency.items(), key=lambda x: (-x[1], x[0]))[0][0]
 
 
 def most_discriminative_feature(dataset, X):

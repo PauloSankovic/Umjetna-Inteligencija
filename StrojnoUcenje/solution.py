@@ -88,6 +88,7 @@ def main(argv):
     test_dataset, results = parse_test_set(argv[1])
     config = parse_config_file(argv[2])
 
+    predictions = []
     if config['model'] == 'ID3':
         model = ID3(config['max_depth'])
         model.fit(train_dataset, header[:-1], set(train_dataset.values()))
@@ -110,7 +111,7 @@ def main(argv):
 
     print("{:.5f}".format(get_accuracy(predictions, results)))
 
-    matrix = confusion_matrix(predictions, results, list(set(train_dataset.values())))
+    matrix = confusion_matrix(predictions, results, sorted(set(train_dataset.values())))
     for x in matrix:
         for y in x:
             print(y, end=" ")
