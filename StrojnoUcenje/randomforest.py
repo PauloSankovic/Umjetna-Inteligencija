@@ -1,5 +1,6 @@
 import random
 from decisiontree import ID3
+from classes import Example
 
 
 class RL:
@@ -14,7 +15,7 @@ class RL:
     def add_tree(self, tree: ID3):
         self.trees.append(tree)
 
-    def fit(self, td: dict, X: list, y: set):
+    def fit(self, td: list, X: list, y: set):
         instance_subset = round(self.example_ratio * len(td))
         feature_subset = round(self.feature_ratio * len(X))
 
@@ -22,12 +23,11 @@ class RL:
             tree = ID3(self.mode, self.max_depth)
 
             indexes = []
-            instances = list(td.keys())
-            td_new = {}
+            td_new = []
             for j in range(instance_subset):
                 index = random.randint(0, len(td) - 1)
                 indexes.append(index)
-                td_new[instances[index]] = td[instances[index]]
+                td_new.append(td[index].copy())
 
             features = []
             for j in range(feature_subset):

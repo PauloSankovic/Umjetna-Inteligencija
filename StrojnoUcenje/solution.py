@@ -1,13 +1,14 @@
 import sys
 from decisiontree import ID3
 from randomforest import RL
+from classes import Example
 
 
 def parse_train_set(file):
     lines = open(file, 'r', encoding='utf-8').read().splitlines()
 
     i = 0
-    train_dataset = {}
+    train_dataset = []
     header = []
     for line in lines:
         if i == 0:
@@ -15,7 +16,7 @@ def parse_train_set(file):
             i += 1
         else:
             parts = line.split(',')
-            train_dataset[tuple(parts[:-1])] = parts[-1]
+            train_dataset.append(Example(parts[:-1], parts[-1]))
 
     return header, train_dataset
 
@@ -88,21 +89,22 @@ def main(argv):
     test_dataset, results = parse_test_set(argv[1])
     config = parse_config_file(argv[2])
 
-    predictions = []
+    model = None
     if config['model'] == 'ID3':
         model = ID3(config['mode'], config['max_depth'])
-        model.fit(train_dataset, header[:-1], set(train_dataset.values()))
+        model.fit(train_dataset, header[:-1], set(map(lambda e: e.cls, train_dataset)))
         model.print_inner_nodes()
         print()
-        predictions = model.predict(test_dataset, header[:-1])
 
     elif config['model'] == 'RF':
-        model = RL(config['mode'], config['num_trees'], config['max_depth'], config['example_ratio'], config['feature_ratio'])
-        model.fit(train_dataset, header[:-1], set(train_dataset.values()))
-        predictions = model.predict(test_dataset, header[:-1])
+        model = RL(config['mode'], config['num_trees'], config['max_depth'], config['example_ratio'],
+                   config['feature_ratio'])
+        model.fit(train_dataset, header[:-1], set(map(lambda e: e.cls, train_dataset)))
 
     else:
         exit("Non implemented model")
+
+    predictions = model.predict(test_dataset, header[:-1])
 
     print(predictions[0], end="")
     for i in range(1, len(predictions)):
@@ -111,7 +113,7 @@ def main(argv):
 
     print("{:.5f}".format(get_accuracy(predictions, results)))
 
-    matrix = confusion_matrix(predictions, results, sorted(set(train_dataset.values())))
+    matrix = confusion_matrix(predictions, results, sorted(set(map(lambda e: e.cls, train_dataset))))
     for x in matrix:
         for y in x:
             print(y, end=" ")
