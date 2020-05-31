@@ -1,6 +1,5 @@
 import random
 from decisiontree import ID3
-from classes import Example
 
 
 class RL:
@@ -22,17 +21,19 @@ class RL:
         for i in range(self.num_trees):
             tree = ID3(self.mode, self.max_depth)
 
+            feature_indexes = []
+            features = []
+            for j in range(feature_subset):
+                index = random.randint(0, len(X) - 1)
+                feature_indexes.append(index)
+                features.append(X[index])
+
             indexes = []
             td_new = []
             for j in range(instance_subset):
                 index = random.randint(0, len(td) - 1)
                 indexes.append(index)
-                td_new.append(td[index].copy())
-
-            features = []
-            for j in range(feature_subset):
-                index = random.randint(0, len(X) - 1)
-                features.append(X[index])
+                td_new.append(td[index].get_all_by_indexes(feature_indexes))
 
             for feature in features:
                 print(feature, end=" ")

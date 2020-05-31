@@ -3,5 +3,8 @@ class Example:
         self.features = features
         self.cls = cls
 
-    def copy(self):
-        return Example(self.features, self.cls)
+    def get_all_by_indexes(self, indexes):
+        result = []
+        for i in indexes:
+            result.append(self.features[i])
+        return Example(result, self.cls)

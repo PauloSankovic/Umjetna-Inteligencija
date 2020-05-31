@@ -5,9 +5,10 @@ from classes import Example
 
 
 class Node:
-    def __init__(self, v, subtrees: list):
+    def __init__(self, v, subtrees: list, label: str):
         self.v = v
         self.subtrees = subtrees
+        self.label = label
 
 
 class Subtree:
@@ -48,15 +49,15 @@ class ID3:
 
 def id3(td: list, td_parent: list, X: list, y: set, feature_values: dict, max_depth: int, depth: int, mode):
     if len(td) == 0:
-        v = most_frequent_label(td_parent)
-        return Leaf(v)
+        label = most_frequent_label(td_parent)
+        return Leaf(label)
 
-    v = most_frequent_label(td)
+    label = most_frequent_label(td)
     if len(X) == 0 or len(set(map(lambda e: e.cls, td))) == 1:
-        return Leaf(v)
+        return Leaf(label)
 
     if 0 <= max_depth <= depth:
-        return Leaf(v)
+        return Leaf(label)
 
     x = most_discriminative_feature(td, X, mode)
     if mode != 'test':
@@ -75,7 +76,7 @@ def id3(td: list, td_parent: list, X: list, y: set, feature_values: dict, max_de
         t = id3(td_copy, td, X.copy(), y.copy(), feature_values, max_depth, depth + 1, mode)
         subtrees.append(Subtree(v, t))
 
-    return Node(x, subtrees)
+    return Node(x, subtrees, label)
 
 
 def most_frequent_label(dataset):
@@ -131,7 +132,10 @@ def most_discriminative_feature(dataset, X, mode):
     return heapq.heappop(information_gain)[1]
 
 
-def id3_predict(parent: Node, test_case, X):
+def id3_predict(parent, test_case, X):
+    if isinstance(parent, Leaf):
+        return parent.v
+
     index = X.index(parent.v)
     value = test_case[index]
     for subtree in parent.subtrees:
@@ -141,7 +145,7 @@ def id3_predict(parent: Node, test_case, X):
             else:
                 return subtree.node.v
 
-    return 'maybe'
+    return parent.label
 
 
 def id3_print_inner_nodes(parent: Node, index: int):
