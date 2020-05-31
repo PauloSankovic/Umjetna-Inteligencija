@@ -90,14 +90,14 @@ def main(argv):
 
     predictions = []
     if config['model'] == 'ID3':
-        model = ID3(config['max_depth'])
+        model = ID3(config['mode'], config['max_depth'])
         model.fit(train_dataset, header[:-1], set(train_dataset.values()))
-        model.print()
+        model.print_inner_nodes()
         print()
         predictions = model.predict(test_dataset, header[:-1])
 
     elif config['model'] == 'RF':
-        model = RL(config['num_trees'], config['max_depth'], config['example_ratio'], config['feature_ratio'])
+        model = RL(config['mode'], config['num_trees'], config['max_depth'], config['example_ratio'], config['feature_ratio'])
         model.fit(train_dataset, header[:-1], set(train_dataset.values()))
         predictions = model.predict(test_dataset, header[:-1])
 

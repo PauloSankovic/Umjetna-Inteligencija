@@ -1,5 +1,6 @@
 import math
 import heapq
+import collections
 
 
 class Node:
@@ -20,12 +21,17 @@ class Leaf:
 
 
 class ID3:
-    def __init__(self, max_depth):
+    def __init__(self, mode: str, max_depth: int):
+        self.mode = mode
         self.max_depth = max_depth
         self.node = None
 
     def fit(self, td: dict, X: list, y: set):
-        self.node = id3(td, td, X, y, self.max_depth, 0)
+        feature_values = {}
+        for i in range(len(X)):
+            feature_values[X[i]] = set(x[i] for x in td)
+
+        self.node = id3(td, td, X, y, feature_values, self.max_depth, 0, self.mode)
 
     def predict(self, test_dataset: list, X: list):
         predictions = []
@@ -34,31 +40,12 @@ class ID3:
 
         return predictions
 
-    def print(self):
-        print_nodes(self.node, 0)
+    def print_inner_nodes(self):
+        print(f"{0}:{self.node.v}", end="")
+        id3_print_inner_nodes(self.node, 0)
 
 
-def id3_predict(parent: Node, test_case, X):
-    index = X.index(parent.v)
-    value = test_case[index]
-    for subtree in parent.subtrees:
-        if subtree.v == value:
-            if isinstance(subtree.node, Node):
-                return id3_predict(subtree.node, test_case, X)
-            else:
-                return subtree.node.v
-
-    return 'maybe'
-
-
-def print_nodes(parent: Node, index: int):
-    print(f"{index}:{parent.v}", end=", ")
-    for subtree in parent.subtrees:
-        if isinstance(subtree.node, Node):
-            print_nodes(subtree.node, index + 1)
-
-
-def id3(td: dict, td_parent: dict, X: list, y: set, max_depth: int, depth: int):
+def id3(td: dict, td_parent: dict, X: list, y: set, feature_values: dict, max_depth: int, depth: int, mode):
     if len(td) == 0:
         v = most_frequent_label(td_parent)
         return Leaf(v)
@@ -70,45 +57,42 @@ def id3(td: dict, td_parent: dict, X: list, y: set, max_depth: int, depth: int):
     if 0 <= max_depth <= depth:
         return Leaf(v)
 
-    x = most_discriminative_feature(td, X)
-    print("Most discriminative feature:", x)
+    x = most_discriminative_feature(td, X, mode)
+    if mode != 'test':
+        print("Most discriminative feature:", x)
 
     subtrees = []
     index = X.index(x)
     X.remove(x)
-    for v in set(i[index] for i in td):
+    for v in feature_values[x]:
         td_copy = {}
         for item, value in td.items():
             if item[index] == v:
                 td_copy[item[:index] + item[index + 1:]] = value
 
-        t = id3(td_copy, td, X.copy(), y.copy(), max_depth, depth + 1)
+        t = id3(td_copy, td, X.copy(), y.copy(), feature_values, max_depth, depth + 1, mode)
         subtrees.append(Subtree(v, t))
 
     return Node(x, subtrees)
 
 
 def most_frequent_label(dataset):
-    frequency = {}
-    for ds in dataset.values():
-        count = frequency.get(ds, 0)
-        frequency[ds] = count + 1
-
-    return sorted(frequency.items(), key=lambda x: (-x[1], x[0]))[0][0]
+    counts = collections.Counter(dataset.values())
+    return sorted(dataset.values(), key=lambda x: (-counts[x], x))[0]
 
 
-def most_discriminative_feature(dataset, X):
-    class_frequency = {}
+def most_discriminative_feature(dataset, X, mode):
     dataset_len = len(dataset)
-    for item in dataset.values():
-        v = class_frequency.get(item, 0)
-        class_frequency[item] = v + 1
+    class_frequency = collections.Counter(dataset.values())
 
     # entropy of the initial dataset
     id_entropy = 0
     for item in class_frequency.values():
         tmp = item / dataset_len
         id_entropy += tmp * math.log2(tmp)
+
+    if mode != 'test':
+        print(f"Initial dataset entropy: {id_entropy}")
 
     id_entropy *= -1
 
@@ -137,7 +121,29 @@ def most_discriminative_feature(dataset, X):
 
             expected_entropy -= classes_len / dataset_len * tmp_entropy
 
-        print("IG({:s})={:.4f}".format(X[i], expected_entropy))
+        if mode != 'test':
+            print("IG({:s})={:.4f}".format(X[i], expected_entropy))
         heapq.heappush(information_gain, (expected_entropy * -1, X[i]))
 
     return heapq.heappop(information_gain)[1]
+
+
+def id3_predict(parent: Node, test_case, X):
+    index = X.index(parent.v)
+    value = test_case[index]
+    for subtree in parent.subtrees:
+        if subtree.v == value:
+            if isinstance(subtree.node, Node):
+                return id3_predict(subtree.node, test_case, X)
+            else:
+                return subtree.node.v
+
+    return 'maybe'
+
+
+def id3_print_inner_nodes(parent: Node, index: int):
+    if index != 0:
+        print(f", {index}:{parent.v}", end="")
+    for subtree in parent.subtrees:
+        if isinstance(subtree.node, Node):
+            id3_print_inner_nodes(subtree.node, index + 1)

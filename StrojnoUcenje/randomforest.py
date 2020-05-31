@@ -3,7 +3,8 @@ from decisiontree import ID3
 
 
 class RL:
-    def __init__(self, num_trees: int, max_depth: int, example_ratio: float, feature_ratio: float):
+    def __init__(self, mode: str, num_trees: int, max_depth: int, example_ratio: float, feature_ratio: float):
+        self.mode = mode
         self.num_trees = num_trees
         self.max_depth = max_depth
         self.example_ratio = example_ratio
@@ -18,7 +19,7 @@ class RL:
         feature_subset = round(self.feature_ratio * len(X))
 
         for i in range(self.num_trees):
-            tree = ID3(self.max_depth)
+            tree = ID3(self.mode, self.max_depth)
 
             indexes = []
             instances = list(td.keys())
